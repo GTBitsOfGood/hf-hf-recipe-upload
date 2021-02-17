@@ -60,7 +60,5 @@ export const getMatchingRecipe = async (recipe: Recipe) => {
     (r) => compareTwoStrings(r.fields.title[LOCALE], recipe.title) >= 0.8
   );
 
-  console.log(existing);
-
   return existing;
 };

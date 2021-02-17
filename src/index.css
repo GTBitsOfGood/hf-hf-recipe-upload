@@ -6,3 +6,7 @@ body {
   justify-content: center;
   font-family: 'Nunito', sans-serif;
 }
+
+pre {
+  font-family: 'Inconsolata', monospace;
+}

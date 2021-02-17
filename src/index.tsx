@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 
 import '@fontsource/nunito';
+import '@fontsource/inconsolata';
 
 ReactDOM.render(
   <React.StrictMode>
