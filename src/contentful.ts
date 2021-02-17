@@ -2,13 +2,16 @@ import * as contentful from 'contentful-management';
 import { Environment } from 'contentful-management/dist/typings/export-types';
 import { compareTwoStrings } from 'string-similarity';
 import { Recipe, Wrapped } from './types';
+import mem from 'mem';
+
+const LOCALE = 'en-US';
 
 const client = contentful.createClient({
   // This is the access token for this space. Normally you get the token in the Contentful web app
   accessToken: process.env.REACT_APP_CONTENTFUL_MANAGEMENT_TOKEN ?? '',
 });
 
-async function genEnvironment(): Promise<Environment> {
+async function genEnvironment_nonMemo(): Promise<Environment> {
   const space = await client.getSpace(
     process.env.REACT_APP_CONTENTFUL_SPACE_ID ?? ''
   );
@@ -18,7 +21,7 @@ async function genEnvironment(): Promise<Environment> {
   return environment;
 }
 
-const LOCALE = 'en-US';
+const genEnvironment = mem(genEnvironment_nonMemo);
 
 function wrapLocale(recipe: Recipe): Wrapped<Recipe> {
   const fields: Wrapped<Recipe> = {};
@@ -43,7 +46,6 @@ export const uploadRecipe = async (recipe: Recipe) => {
     fields: formattedRecipe,
   });
 
-  // await entry.publish();
   console.log(entry);
 };
 
@@ -54,11 +56,11 @@ export const getMatchingRecipe = async (recipe: Recipe) => {
     content_type: 'recipe',
   });
 
-  console.log(existingRecipes.items);
-
   const existing = existingRecipes.items.find(
     (r) => compareTwoStrings(r.fields.title[LOCALE], recipe.title) >= 0.8
   );
+
+  console.log(existing);
 
   return existing;
 };
