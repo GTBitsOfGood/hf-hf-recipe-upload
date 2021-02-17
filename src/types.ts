@@ -14,3 +14,9 @@ export type Wrapped<T> = {
     'en-US': string | number;
   };
 };
+
+export interface RecipeFileInfo {
+  recipe: Recipe;
+  exists: boolean;
+  fileName: string;
+}

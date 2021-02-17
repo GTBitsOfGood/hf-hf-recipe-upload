@@ -1,3 +1,4 @@
+import { Box, Text } from '@chakra-ui/react';
 import React, { useCallback, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 
@@ -71,12 +72,14 @@ function StyledDropzone({ setFiles }: Props) {
   );
 
   return (
-    <div className="container">
-      <div {...getRootProps({ style })}>
+    <Box className="container">
+      <Box {...getRootProps({ style })}>
         <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
-      </div>
-    </div>
+        <Text textStyle="body">
+          Drag 'n' drop some files here, or click to select files
+        </Text>
+      </Box>
+    </Box>
   );
 }
 

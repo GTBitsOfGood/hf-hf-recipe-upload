@@ -4,14 +4,9 @@ import { parseRecipe } from './parseRecipe';
 import { getMatchingRecipe } from './contentful';
 import StyledDropzone from './StyledDropzone';
 import { usePrevious } from './util';
-import { IoAlertCircleOutline, IoClose } from 'react-icons/io5';
-import { Recipe } from './types';
-
-interface RecipeFileInfo {
-  recipe: Recipe;
-  exists: boolean;
-  fileName: string;
-}
+import { RecipeFileInfo } from './types';
+import { Box, Button, Container, Stack } from '@chakra-ui/react';
+import FileList from './FileList';
 
 function App() {
   const [files, setFiles] = useState<File[]>([]);
@@ -72,38 +67,20 @@ function App() {
     parseFiles(newFiles);
   }, [files, parseFiles, prevFiles]);
 
-  return (
-    <div className="App">
-      <StyledDropzone setFiles={setFiles} />
-      <button onClick={() => console.log('upload!')}>upload</button>
+  const uploadableCount = recipes.filter((r) => !r.exists).length;
 
-      {recipes.map((recipeInfo, i) => {
-        const { recipe, exists } = recipeInfo;
-        return (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <p>{recipe.title}</p>
-              {exists && (
-                <IoAlertCircleOutline style={{ marginLeft: '0.5em' }} />
-              )}
-            </div>
-            <IoClose onClick={() => removeRecipe(recipeInfo)} />
-          </div>
-        );
-      })}
-    </div>
+  return (
+    <Container>
+      <Stack spacing={8}>
+        <Box mt={32}>
+          <StyledDropzone setFiles={setFiles} />
+        </Box>
+        <FileList recipes={recipes} removeRecipe={removeRecipe} />
+        <Button onClick={() => console.log('upload!')}>
+          Upload{uploadableCount > 0 && ` (${uploadableCount})`}
+        </Button>
+      </Stack>
+    </Container>
   );
 }
 
