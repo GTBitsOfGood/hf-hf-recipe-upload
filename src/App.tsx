@@ -1,10 +1,10 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import mammoth from 'mammoth';
 import { parseRecipe } from './util';
+import { getMatchingRecipe } from './contentful';
 
 function App() {
   const [files, setFiles] = useState<File[]>([]);
-  const outputRef = useRef<HTMLDivElement>(null);
 
   const readFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -28,7 +28,8 @@ function App() {
 
     (async () => {
       const r = await mammoth.convertToHtml({ arrayBuffer });
-      parseRecipe(r.value);
+      const recipe = parseRecipe(r.value);
+      getMatchingRecipe(recipe);
     })();
   };
 
@@ -46,7 +47,7 @@ function App() {
       <input type="file" onChange={readFiles} multiple />
       <button onClick={parseFiles}>boop</button>
 
-      <div ref={outputRef}></div>
+      <div className="output"></div>
     </div>
   );
 }

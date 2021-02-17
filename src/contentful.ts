@@ -1,28 +1,12 @@
 import * as contentful from 'contentful-management';
 import { Environment } from 'contentful-management/dist/typings/export-types';
-import { Recipe } from './types';
+import { compareTwoStrings } from 'string-similarity';
+import { Recipe, Wrapped } from './types';
 
 const client = contentful.createClient({
   // This is the access token for this space. Normally you get the token in the Contentful web app
   accessToken: process.env.REACT_APP_CONTENTFUL_MANAGEMENT_TOKEN ?? '',
 });
-
-async function run() {
-  // This API call will request a space with the specified ID
-  const environment = await genEnvironment();
-
-  const recipeType = await environment.getContentType('recipe');
-  console.log(recipeType);
-
-  // Now that we have a space, we can get entries from that space
-  const entries = await environment.getEntries({ content_type: 'recipe' });
-  console.log(entries.items[1].toPlainObject());
-
-  //   const entry = await environment.createEntry('recipe', newRecipeData);
-  //   console.log(entry);
-}
-
-run();
 
 async function genEnvironment(): Promise<Environment> {
   const space = await client.getSpace(
@@ -34,21 +18,47 @@ async function genEnvironment(): Promise<Environment> {
   return environment;
 }
 
-const locale = 'en-US';
+const LOCALE = 'en-US';
 
-const uploadRecipe = async (recipe: Recipe) => {
+function wrapLocale(recipe: Recipe): Wrapped<Recipe> {
+  const fields: Wrapped<Recipe> = {};
+
+  (Object.keys(recipe) as Array<keyof typeof recipe>).forEach((key) => {
+    const val = recipe[key];
+    if (val == null) {
+      return;
+    }
+    fields[key] = { [LOCALE]: val };
+  });
+
+  return fields;
+}
+
+export const uploadRecipe = async (recipe: Recipe) => {
   const environment = await genEnvironment();
 
-  const newRecipeData = {
-    fields: {
-      title: {
-        [locale]: recipe.title,
-      },
-    },
-  };
+  const formattedRecipe = wrapLocale(recipe);
 
-  const entry = await environment.createEntry('recipe', newRecipeData);
+  const entry = await environment.createEntry('recipe', {
+    fields: formattedRecipe,
+  });
+
+  // await entry.publish();
   console.log(entry);
 };
 
-export { uploadRecipe };
+export const getMatchingRecipe = async (recipe: Recipe) => {
+  const environment = await genEnvironment();
+
+  const existingRecipes = await environment.getEntries({
+    content_type: 'recipe',
+  });
+
+  console.log(existingRecipes.items);
+
+  const existing = existingRecipes.items.find(
+    (r) => compareTwoStrings(r.fields.title[LOCALE], recipe.title) >= 0.8
+  );
+
+  return existing;
+};

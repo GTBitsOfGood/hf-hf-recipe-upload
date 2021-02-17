@@ -1,21 +1,16 @@
-export interface IngredientSection {
-  title: string;
-  ingredients: Ingredient[];
-}
-
-export interface Ingredient {
-  name: string;
-  amount: string;
-  notes: string;
-}
-
 export interface Recipe {
   title: string;
-  yield: number;
-  prepTime: number;
-  totalTime: number;
-  ingredients: IngredientSection[];
-  prepDirections: string[];
-  directions: string[];
-  notes: string[];
+  yield: string;
+  prepTime?: number;
+  totalTime?: number;
+  ingredients: string;
+  prepDirections?: string;
+  directions: string;
+  notes?: string;
 }
+
+export type Wrapped<T> = {
+  [K in keyof T]?: {
+    'en-US': string | number;
+  };
+};
