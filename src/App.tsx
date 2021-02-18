@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import mammoth from 'mammoth';
 import { parseRecipe } from './parseRecipe';
-import { getMatchingRecipe } from './contentful';
+import { getMatchingRecipe, uploadRecipe } from './contentful';
 import StyledDropzone from './StyledDropzone';
 import { usePrevious } from './util';
-import { RecipeFileInfo } from './types';
+import { RecipeFileInfo, RecipeFileLoadingState } from './types';
 import { Box, Button, Container, Stack } from '@chakra-ui/react';
 import FileList from './FileList';
 
 function App() {
   const [files, setFiles] = useState<File[]>([]);
-  const [recipes, setRecipes] = useState<RecipeFileInfo[]>([]);
+  const [recipes, setRecipes] = useState<RecipeFileLoadingState[]>([]);
+  const [isUploading, setUploading] = useState(false);
 
   const prevFiles = usePrevious(files);
 
@@ -19,6 +20,18 @@ function App() {
 
     files.forEach((file) => {
       const reader = new FileReader();
+
+      reader.onloadstart = () => {
+        setRecipes((oldRecipes) => {
+          return [
+            ...oldRecipes,
+            {
+              fileName: file.name,
+              loading: true,
+            },
+          ];
+        });
+      };
 
       reader.onloadend = (e: ProgressEvent<FileReader>) => {
         if (e.target == null) return;
@@ -36,8 +49,13 @@ function App() {
 
           setRecipes((oldRecipes) => {
             return [
-              ...oldRecipes,
-              { recipe, exists: matching != null, fileName: file.name },
+              ...oldRecipes.filter((r) => r.fileName !== file.name),
+              {
+                recipe,
+                exists: matching != null,
+                fileName: file.name,
+                loading: false,
+              },
             ];
           });
         })();
@@ -52,12 +70,34 @@ function App() {
   const removeRecipe = (del: RecipeFileInfo) => {
     setRecipes((oldRecipes) => {
       return oldRecipes.filter(
-        ({ recipe }) => recipe.title !== del.recipe.title
+        (recipeInfo) =>
+          !recipeInfo.loading && recipeInfo.recipe.title !== del.recipe.title
       );
     });
     setFiles((oldFiles) => {
       return oldFiles.filter((file) => file.name !== del.fileName);
     });
+  };
+
+  const updateRecipe = (recipe: RecipeFileInfo) => {
+    setRecipes((oldRecipes) => [
+      ...oldRecipes.filter(
+        (recipeInfo) =>
+          !recipeInfo.loading && recipeInfo.recipe.title !== recipe.recipe.title
+      ),
+      recipe,
+    ]);
+  };
+
+  const uploadRecipes = async () => {
+    setUploading(true);
+    for (let info of recipes) {
+      if (info.loading || info.exists) {
+        continue;
+      }
+      await uploadRecipe(info.recipe);
+    }
+    setUploading(false);
   };
 
   useEffect(() => {
@@ -67,7 +107,7 @@ function App() {
     parseFiles(newFiles);
   }, [files, parseFiles, prevFiles]);
 
-  const uploadableCount = recipes.filter((r) => !r.exists).length;
+  const uploadableCount = recipes.filter((r) => !r.loading && !r.exists).length;
 
   return (
     <Container>
@@ -75,8 +115,16 @@ function App() {
         <Box mt={32}>
           <StyledDropzone setFiles={setFiles} />
         </Box>
-        <FileList recipes={recipes} removeRecipe={removeRecipe} />
-        <Button onClick={() => console.log('upload!')}>
+        <FileList
+          recipes={recipes}
+          removeRecipe={removeRecipe}
+          updateRecipe={updateRecipe}
+        />
+        <Button
+          onClick={() => uploadRecipes()}
+          disabled={uploadableCount === 0}
+          isLoading={isUploading}
+        >
           Upload{uploadableCount > 0 && ` (${uploadableCount})`}
         </Button>
       </Stack>

@@ -15,8 +15,16 @@ export type Wrapped<T> = {
   };
 };
 
-export interface RecipeFileInfo {
+export type RecipeFileLoadingState = RecipeFileInfo | RecipeLoading;
+
+export type RecipeFileInfo = {
   recipe: Recipe;
   exists: boolean;
+  loading: false;
   fileName: string;
-}
+};
+
+export type RecipeLoading = {
+  loading: true;
+  fileName: string;
+};

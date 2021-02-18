@@ -6,15 +6,23 @@ import '@fontsource/inconsolata';
 
 // 2. Call `extendTheme` and pass your custom values
 const theme = extendTheme({
+  fonts: {
+    heading: `Nunito, sans-serif`,
+    body: `Nunito, sans-serif`,
+    mono: `Inconsolata, monospace`,
+  },
   textStyles: {
     body: {
       fontFamily: `Nunito, sans-serif`,
     },
+    mono: {
+      fontFamily: `Inconsolata, monospace`,
+    },
   },
   components: {
-    Button: {
+    Textarea: {
       baseStyle: {
-        fontFamily: `Nunito, sans-serif`,
+        fontFamily: `Inconsolata, monospace`,
       },
     },
   },
