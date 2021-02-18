@@ -1,34 +1,6 @@
-import { Box, Text } from '@chakra-ui/react';
-import React, { useCallback, useMemo } from 'react';
+import { Box, Center, Text } from '@chakra-ui/react';
+import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-
-const baseStyle: React.CSSProperties = {
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: '20px',
-  borderWidth: 2,
-  borderRadius: 2,
-  borderColor: '#eeeeee',
-  borderStyle: 'dashed',
-  backgroundColor: '#fafafa',
-  color: '#bdbdbd',
-  outline: 'none',
-  transition: 'border .24s ease-in-out',
-};
-
-const activeStyle = {
-  borderColor: '#2196f3',
-};
-
-const acceptStyle = {
-  borderColor: '#00e676',
-};
-
-const rejectStyle = {
-  borderColor: '#ff1744',
-};
 
 interface Props {
   setFiles: React.Dispatch<React.SetStateAction<File[]>>;
@@ -53,32 +25,34 @@ function StyledDropzone({ setFiles }: Props) {
     [setFiles]
   );
 
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({ onDrop });
-
-  const style = useMemo(
-    () => ({
-      ...baseStyle,
-      ...(isDragActive ? activeStyle : {}),
-      ...(isDragAccept ? acceptStyle : {}),
-      ...(isDragReject ? rejectStyle : {}),
-    }),
-    [isDragActive, isDragReject, isDragAccept]
-  );
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
     <Box className="container">
-      <Box {...getRootProps({ style })}>
+      <Center
+        h={32}
+        border="1px solid teal"
+        borderRadius={6}
+        transition="all 0.2s ease-in-out"
+        sx={
+          isDragActive
+            ? {
+                bg: 'teal.50',
+                color: 'teal.600',
+              }
+            : {
+                bg: 'teal.100',
+                color: 'teal.800',
+              }
+        }
+        {...getRootProps()}
+        _hover={{ bg: 'teal.50', color: 'teal.600' }}
+      >
         <input {...getInputProps()} />
         <Text textStyle="body">
           Drag 'n' drop some files here, or click to select files
         </Text>
-      </Box>
+      </Center>
     </Box>
   );
 }
