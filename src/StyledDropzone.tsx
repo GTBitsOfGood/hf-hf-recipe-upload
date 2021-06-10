@@ -31,6 +31,7 @@ function StyledDropzone({ setFiles }: Props) {
     <Box className="container">
       <Center
         h={32}
+        cursor="pointer"
         border="1px solid teal"
         borderRadius={6}
         transition="all 0.2s ease-in-out"
