@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import mammoth from 'mammoth';
 import { parseRecipe } from './parseRecipe';
 import { getMatchingRecipe, uploadRecipe } from './contentful';
+import Title from './Title';
 import StyledDropzone from './StyledDropzone';
 import { usePrevious } from './util';
 import { RecipeFileInfo, RecipeFileLoadingState } from './types';
@@ -113,6 +114,9 @@ function App() {
   return (
     <Container>
       <Stack spacing={8}>
+        <Box mt={20}>
+          <Title />
+        </Box>
         <Box mt={32}>
           <StyledDropzone setFiles={setFiles} />
         </Box>
