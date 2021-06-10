@@ -25,7 +25,7 @@ function StyledDropzone({ setFiles }: Props) {
     [setFiles]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: '.docx' });
 
   return (
     <Box className="container">
@@ -49,8 +49,12 @@ function StyledDropzone({ setFiles }: Props) {
         _hover={{ bg: 'teal.50', color: 'teal.600' }}
       >
         <input {...getInputProps()} />
-        <Text textStyle="body">
-          Drag 'n' drop some files here, or click to select files
+        <Text textStyle="body" textAlign="center">
+          Drag 'n' drop recipes here, or click to select recipe files!
+          <br></br>
+          <i>
+            Only <b>*.docx</b> files are accepted.
+          </i>
         </Text>
       </Center>
     </Box>
