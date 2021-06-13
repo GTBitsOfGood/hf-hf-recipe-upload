@@ -56,6 +56,7 @@ function App() {
                 exists: matching != null,
                 fileName: file.name,
                 loading: false,
+                uploaded: false,
               },
             ];
           });
@@ -93,11 +94,19 @@ function App() {
   const uploadRecipes = async () => {
     setUploading(true);
     for (let info of recipes) {
-      if (info.loading || info.exists) {
+      if (info.loading || info.exists || info.uploaded) {
         continue;
       }
       await uploadRecipe(info.recipe);
     }
+    setRecipes((oldRecipes) => {
+      return [
+        ...oldRecipes.map((r) => ({
+          ...r,
+          uploaded: true,
+        })),
+      ];
+    });
     setUploading(false);
   };
 
@@ -108,7 +117,7 @@ function App() {
     parseFiles(newFiles);
   }, [files, parseFiles, prevFiles]);
 
-  const uploadableCount = recipes.filter((r) => !r.loading && !r.exists).length;
+  const uploadableCount = recipes.filter((r) => !r.loading && !r.exists && !r.uploaded).length;
 
   return (
     <Container>

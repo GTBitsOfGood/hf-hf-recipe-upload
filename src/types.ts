@@ -23,6 +23,7 @@ export type RecipeFileInfo = {
   exists: boolean;
   loading: false;
   fileName: string;
+  uploaded: boolean;
 };
 
 export type RecipeLoading = {

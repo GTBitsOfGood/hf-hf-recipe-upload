@@ -97,8 +97,11 @@ interface Props {
 }
 
 const FileList = ({ recipes, removeRecipe, updateRecipe }: Props) => {
+  const uploaded: RecipeFileInfo[] = recipes.filter(
+    (r): r is RecipeFileInfo => !r.loading && !r.exists && r.uploaded
+  );
   const toUpload: RecipeFileInfo[] = recipes.filter(
-    (r): r is RecipeFileInfo => !r.loading && !r.exists
+    (r): r is RecipeFileInfo => !r.loading && !r.exists && !r.uploaded
   );
   const errors: RecipeFileInfo[] = recipes.filter(
     (r): r is RecipeFileInfo => !r.loading && r.exists
@@ -135,6 +138,26 @@ const FileList = ({ recipes, removeRecipe, updateRecipe }: Props) => {
 
         <AccordionPanel>
           {toUpload.map((recipeInfo, i) => (
+            <FileCard
+              recipeInfo={recipeInfo}
+              onClose={removeRecipe}
+              key={i}
+              updateRecipe={updateRecipe}
+            />
+          ))}
+        </AccordionPanel>
+      </AccordionItem>
+
+      <AccordionItem isDisabled={uploaded.length === 0}>
+        <AccordionButton textStyle="body">
+          <Box flex="1" textAlign="left">
+            Uploaded ({uploaded.length})
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+
+        <AccordionPanel>
+          {uploaded.map((recipeInfo, i) => (
             <FileCard
               recipeInfo={recipeInfo}
               onClose={removeRecipe}
