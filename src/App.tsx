@@ -40,7 +40,7 @@ function App() {
 
         (async () => {
           const r = await mammoth.convertToHtml({ arrayBuffer });
-          const recipe = parseRecipe(r.value);
+          const { recipe, errors } = parseRecipe(r.value);
           const matching = await getMatchingRecipe(recipe);
           if (matching != null) {
             console.log(
@@ -57,6 +57,7 @@ function App() {
                 fileName: file.name,
                 loading: false,
                 uploaded: false,
+                errors,
               },
             ];
           });
@@ -94,7 +95,7 @@ function App() {
   const uploadRecipes = async () => {
     setUploading(true);
     for (let info of recipes) {
-      if (info.loading || info.exists || info.uploaded) {
+      if (info.loading || info.exists || info.errors.length > 0 || info.uploaded) {
         continue;
       }
       await uploadRecipe(info.recipe);
@@ -117,7 +118,7 @@ function App() {
     parseFiles(newFiles);
   }, [files, parseFiles, prevFiles]);
 
-  const uploadableCount = recipes.filter((r) => !r.loading && !r.exists && !r.uploaded).length;
+  const uploadableCount = recipes.filter((r) => !r.loading && !r.exists && r.errors.length === 0 && !r.uploaded).length;
 
   return (
     <Container>

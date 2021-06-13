@@ -24,6 +24,7 @@ export type RecipeFileInfo = {
   loading: false;
   fileName: string;
   uploaded: boolean;
+  errors: string[];
 };
 
 export type RecipeLoading = {

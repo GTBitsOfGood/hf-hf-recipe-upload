@@ -39,7 +39,7 @@ interface FileCardProps {
 }
 
 const FileCard = ({ recipeInfo, onClose, updateRecipe }: FileCardProps) => {
-  const { recipe, exists } = recipeInfo;
+  const { recipe, exists, errors } = recipeInfo;
   const { isOpen, onOpen, onClose: onModalClose, onToggle } = useDisclosure();
 
   const modal = (
@@ -78,6 +78,17 @@ const FileCard = ({ recipeInfo, onClose, updateRecipe }: FileCardProps) => {
               <InfoOutlineIcon />
             </Tooltip>
           )}
+          {errors.length > 0 && (
+            <Tooltip
+              hasArrow
+              label={`Errors while parsing: ${errors.join(', ')}`}
+              placement="top"
+              textStyle="body"
+              p={3}
+            >
+              <InfoOutlineIcon />
+            </Tooltip>
+          )}
         </HStack>
         <CloseButton
           onClick={(e) => {
@@ -101,10 +112,13 @@ const FileList = ({ recipes, removeRecipe, updateRecipe }: Props) => {
     (r): r is RecipeFileInfo => !r.loading && !r.exists && r.uploaded
   );
   const toUpload: RecipeFileInfo[] = recipes.filter(
-    (r): r is RecipeFileInfo => !r.loading && !r.exists && !r.uploaded
+    (r): r is RecipeFileInfo => !r.loading && !r.exists && r.errors.length === 0 && !r.uploaded
   );
-  const errors: RecipeFileInfo[] = recipes.filter(
+  const ignored: RecipeFileInfo[] = recipes.filter(
     (r): r is RecipeFileInfo => !r.loading && r.exists
+  );
+  const errored: RecipeFileInfo[] = recipes.filter(
+    (r): r is RecipeFileInfo => !r.loading && r.errors.length > 0,
   );
   const loading: RecipeLoading[] = recipes.filter(
     (r): r is RecipeLoading => r.loading
@@ -168,16 +182,36 @@ const FileList = ({ recipes, removeRecipe, updateRecipe }: Props) => {
         </AccordionPanel>
       </AccordionItem>
 
-      <AccordionItem isDisabled={errors.length === 0}>
+      <AccordionItem isDisabled={ignored.length === 0}>
         <AccordionButton textStyle="body">
           <Box flex="1" textAlign="left">
-            Ignored ({errors.length})
+            Already Exists ({ignored.length})
           </Box>
           <AccordionIcon />
         </AccordionButton>
 
         <AccordionPanel>
-          {errors.map((recipeInfo, i) => (
+          {ignored.map((recipeInfo, i) => (
+            <FileCard
+              recipeInfo={recipeInfo}
+              onClose={removeRecipe}
+              key={i}
+              updateRecipe={updateRecipe}
+            />
+          ))}
+        </AccordionPanel>
+      </AccordionItem>
+
+      <AccordionItem isDisabled={errored.length === 0}>
+        <AccordionButton textStyle="body">
+          <Box flex="1" textAlign="left">
+            Parsing Errors ({errored.length})
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+
+        <AccordionPanel>
+          {errored.map((recipeInfo, i) => (
             <FileCard
               recipeInfo={recipeInfo}
               onClose={removeRecipe}

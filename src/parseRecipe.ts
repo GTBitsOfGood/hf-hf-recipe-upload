@@ -100,21 +100,90 @@ function parseRecipe(rawText: string) {
   // console.log(timeToMinutes(prepTimeLines));
   // console.log(timeToMinutes(totalTimeLines));
 
-  const recipe: Recipe = {
-    title: titleLines[0],
-    ingredients: ingredientsToString(ingredientsLines),
-    prepTime: timeToMinutes(prepTimeLines),
-    totalTime: timeToMinutes(totalTimeLines),
-    yield: yieldToString(yieldLines),
-    prepDirections: stepsToString(preDirectionsLines),
-    notes: stepsToString(notesLines),
-    directions: stepsToString(directionsLines) ?? '',
-    specialDietInformation: specialDietLinesToString(specialDietInfoLines)
-  };
-  // console.log(recipe);
-  // uploadRecipe(recipe);
+  const errors = [];
 
-  return recipe;
+  let title;
+  let ingredients;
+  let prepTime;
+  let totalTime;
+  let recipeYield;
+  let prepDirections;
+  let notes;
+  let directions;
+  let specialDietInformation;
+  
+  try {
+    title = titleLines[0];
+  } catch (_) {
+    title = '';
+    errors.push('Title');
+  }
+
+  try {
+    ingredients = ingredientsToString(ingredientsLines);
+  } catch (_) {
+    ingredients = '';
+    errors.push('Ingredients');
+  }
+
+  try {
+    prepTime = timeToMinutes(prepTimeLines);
+  } catch (_) {
+    errors.push('Prep time');
+  }
+
+  try {
+    totalTime = timeToMinutes(totalTimeLines);
+  } catch (_) {
+    errors.push('Total time');
+  }
+
+  try {
+    recipeYield = yieldToString(yieldLines);
+  } catch (_) {
+    recipeYield = '';
+    errors.push('Yield');
+  }
+
+  try {
+    prepDirections = stepsToString(preDirectionsLines);
+  } catch (_) {
+    errors.push('Pre-class prep');
+  }
+
+  try {
+    notes = stepsToString(notesLines);
+  } catch (_) {
+    errors.push('Notes');
+  }
+
+  try {
+    directions = stepsToString(directionsLines) ?? '';
+  } catch (_) {
+    directions = '';
+    errors.push('Directions');
+  }
+
+  try {
+    specialDietInformation = specialDietLinesToString(specialDietInfoLines);
+  } catch (_) {
+    specialDietInformation = '';
+    errors.push('special diet info');
+  }
+
+  const recipe: Recipe = {
+    title,
+    ingredients,
+    prepTime,
+    totalTime,
+    yield: recipeYield,
+    prepDirections,
+    notes,
+    directions,
+    specialDietInformation,
+  }
+
+  return { recipe, errors };
 }
 
 function stepsToString(lines: string[]) {
