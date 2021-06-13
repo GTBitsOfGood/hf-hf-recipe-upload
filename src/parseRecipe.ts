@@ -195,6 +195,7 @@ function stepsToString(lines: string[]) {
 function yieldToString(yieldLines: string[]) {
   const joined = yieldLines.join(' ');
   const [, out] = joined.split(/[yY]ield:?/);
+  if (!out) return '';
   return out.trim();
 }
 
