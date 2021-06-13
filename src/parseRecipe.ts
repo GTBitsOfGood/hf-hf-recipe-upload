@@ -162,7 +162,7 @@ function ingredientsToString(ingredientLines: string[]) {
     let amount = '';
     let splitOnTab = line.split(/\t+\s*\t*/);
     if (splitOnTab.length === 1) {
-      name = splitOnTab[0].trim();
+      return; // just ignore sub-headings
     } else {
       [amount, name] = splitOnTab;
       amount = amount.trim();
