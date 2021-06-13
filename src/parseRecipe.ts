@@ -145,6 +145,8 @@ function ingredientsToString(ingredientLines: string[]) {
   const outlines: string[] = [];
 
   ingredientLines.forEach((line) => {
+    if (line.indexOf('\t') === -1) return; // ignore sub-headings
+
     line = line.trim();
 
     if (compareTwoStrings(line, 'ingredients') >= 0.8) {
@@ -162,7 +164,7 @@ function ingredientsToString(ingredientLines: string[]) {
     let amount = '';
     let splitOnTab = line.split(/\t+\s*\t*/);
     if (splitOnTab.length === 1) {
-      return; // just ignore sub-headings
+      name = splitOnTab[0].trim();
     } else {
       [amount, name] = splitOnTab;
       amount = amount.trim();
