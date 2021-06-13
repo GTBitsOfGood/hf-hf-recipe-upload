@@ -51,7 +51,7 @@ function StyledDropzone({ setFiles }: Props) {
       >
         <input {...getInputProps()} />
         <Text textStyle="body" textAlign="center">
-          Drag 'n' drop recipes here, or click to select recipe files!
+          Drag 'n' drop recipes here, or click to select recipe files.
           <br></br>
           <i>
             Only <b>*.docx</b> files are accepted.

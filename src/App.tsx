@@ -8,7 +8,6 @@ import { usePrevious } from './util';
 import { RecipeFileInfo, RecipeFileLoadingState } from './types';
 import { Box, Button, Container, Stack } from '@chakra-ui/react';
 import FileList from './FileList';
-import Rules from './Rules';
 
 function App() {
   const [files, setFiles] = useState<File[]>([]);
@@ -120,7 +119,6 @@ function App() {
         <Box mt={32}>
           <StyledDropzone setFiles={setFiles} />
         </Box>
-        <Rules />
         <FileList
           recipes={recipes}
           removeRecipe={removeRecipe}
