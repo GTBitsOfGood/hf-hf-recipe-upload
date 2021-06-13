@@ -7,6 +7,7 @@ export interface Recipe {
   prepDirections?: string;
   directions: string;
   notes?: string;
+  specialDietInformation: string;
 }
 
 export type Wrapped<T> = {

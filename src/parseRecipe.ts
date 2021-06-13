@@ -3,8 +3,23 @@ import { unescape } from 'html-escaper';
 import parse from 'parse-duration';
 import { compareTwoStrings } from 'string-similarity';
 
+/**
+ * README: Many of the regular expressions in the `parseRecipe` function
+ * may make you scream just looking at them. They were developed with love
+ * using actual recipe files to catch as many edge cases as humanly possible.
+ * 
+ * So before you throw up your hands, plug the recipes into a website
+ * like https://regex101.com/ (<-- very helpful!) and take some deep breaths.
+ * 
+ * You've got this.
+ * 
+ * <3 Max Karpawich
+ */
+
 function parseRecipe(rawText: string) {
-  const root = rawText.replace(/<\/?[^>]+(>|$)/g, '\n');
+  const root = rawText
+    .replace(/<\/?(b|strong|i)(>|$)/g, '') // removes text styling tags
+    .replace(/<\/?[^>]+(>|$)/g, '\n'); // replaces all other tags with newlines
 
   let lines = root.split('\n');
 
@@ -16,13 +31,16 @@ function parseRecipe(rawText: string) {
   );
 
   const preDirectionsIdx = lines.findIndex((line) =>
-    line.toLowerCase().includes('pre-class')
+    line.toLowerCase().includes('pre-class') ||
+    line.toLowerCase().includes('before class')
   );
 
   const directionsIdx = lines.findIndex(
     (line) =>
-      line.toLowerCase().includes('directions') &&
-      !line.toLowerCase().includes('pre')
+      (
+        line.toLowerCase().trim() === ('directions') ||
+        line.toLowerCase().trim() === ('method of preparation')
+      )
   );
 
   const notesIdx = lines.findIndex(
@@ -41,6 +59,10 @@ function parseRecipe(rawText: string) {
     line.toLowerCase().includes('total time')
   );
 
+  const specialDietInfoIdx = lines.findIndex((line) =>
+  line.toLowerCase().includes('special diet info')
+);
+
   const titleIdx = 0; // probably
 
   const breakpoints = [
@@ -48,6 +70,7 @@ function parseRecipe(rawText: string) {
     preDirectionsIdx,
     directionsIdx,
     notesIdx,
+    specialDietInfoIdx,
     yieldIdx,
     prepTimeIdx,
     totalTimeIdx,
@@ -65,6 +88,7 @@ function parseRecipe(rawText: string) {
   const notesLines = sliceFrom(notesIdx);
   const directionsLines = sliceFrom(directionsIdx);
   const preDirectionsLines = sliceFrom(preDirectionsIdx);
+  const specialDietInfoLines = sliceFrom(specialDietInfoIdx);
 
   const yieldLines = sliceFrom(yieldIdx);
   const prepTimeLines = sliceFrom(prepTimeIdx);
@@ -85,6 +109,7 @@ function parseRecipe(rawText: string) {
     prepDirections: stepsToString(preDirectionsLines),
     notes: stepsToString(notesLines),
     directions: stepsToString(directionsLines) ?? '',
+    specialDietInformation: specialDietLinesToString(specialDietInfoLines)
   };
   // console.log(recipe);
   // uploadRecipe(recipe);
@@ -135,7 +160,7 @@ function ingredientsToString(ingredientLines: string[]) {
 
     let name = '';
     let amount = '';
-    let splitOnTab = line.split(/\t+/);
+    let splitOnTab = line.split(/\t+\s*\t*/);
     if (splitOnTab.length === 1) {
       name = splitOnTab[0].trim();
     } else {
@@ -160,6 +185,15 @@ function ingredientsToString(ingredientLines: string[]) {
   });
 
   return outlines.join('\n');
+}
+
+function specialDietLinesToString(specialDietLines: string[]) {
+  if (specialDietLines.length === 0) {
+    return '';
+  }
+  return specialDietLines
+    .slice(1)
+    .join(' ');
 }
 
 function readFile(file: File) {
