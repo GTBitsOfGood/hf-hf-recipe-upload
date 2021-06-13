@@ -103,13 +103,13 @@ function parseRecipe(rawText: string) {
   const errors = [];
 
   let title;
-  let ingredients;
+  let ingredients = '';
   let prepTime;
   let totalTime;
   let recipeYield;
   let prepDirections;
   let notes;
-  let directions;
+  let directions = '';
   let specialDietInformation;
   
   try {
@@ -122,7 +122,6 @@ function parseRecipe(rawText: string) {
   try {
     ingredients = ingredientsToString(ingredientsLines);
   } catch (_) {
-    ingredients = '';
     errors.push('Ingredients');
   }
 
@@ -141,7 +140,6 @@ function parseRecipe(rawText: string) {
   try {
     recipeYield = yieldToString(yieldLines);
   } catch (_) {
-    recipeYield = '';
     errors.push('Yield');
   }
 
@@ -160,15 +158,13 @@ function parseRecipe(rawText: string) {
   try {
     directions = stepsToString(directionsLines) ?? '';
   } catch (_) {
-    directions = '';
     errors.push('Directions');
   }
 
   try {
     specialDietInformation = specialDietLinesToString(specialDietInfoLines);
   } catch (_) {
-    specialDietInformation = '';
-    errors.push('special diet info');
+    errors.push('Special diet info');
   }
 
   const recipe: Recipe = {

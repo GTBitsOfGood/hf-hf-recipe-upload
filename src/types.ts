@@ -1,13 +1,13 @@
 export interface Recipe {
   title: string;
-  yield: string;
+  yield?: string;
   prepTime?: number;
   totalTime?: number;
   ingredients: string;
   prepDirections?: string;
   directions: string;
   notes?: string;
-  specialDietInformation: string;
+  specialDietInformation?: string;
 }
 
 export type Wrapped<T> = {
