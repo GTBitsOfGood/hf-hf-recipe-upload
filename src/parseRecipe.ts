@@ -38,8 +38,8 @@ function parseRecipe(rawText: string) {
   const directionsIdx = lines.findIndex(
     (line) =>
       (
-        line.toLowerCase().trim() === ('directions') ||
-        line.toLowerCase().trim() === ('method of preparation')
+        line.toLowerCase().trim().replace(/[^a-z\s]/g, '') === ('directions') ||
+        line.toLowerCase().trim().replace(/[^a-z\s]/g, '') === ('method of preparation')
       )
   );
 
